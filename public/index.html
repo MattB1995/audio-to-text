@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
     <h1>Audio To Text Converter</h1>
@@ -59,7 +60,7 @@
 
                 mediaRecorder.stop();
 
-                mediaRecorder.onstop = (e) => {
+                mediaRecorder.onstop = async (e) => {
                     const audioClip = document.createElement("audio");
 
                     audioClip.setAttribute("controls", "")
@@ -67,6 +68,14 @@
                     audioClipsContainer.appendChild(audioClip);
 
                     const blob = new Blob(chunks, {type: "audio/mp3; codecs=opus"});
+
+                    const data = new FormData();
+                    data.append('audio', blob);
+
+
+                    const res = await axios.post('http://localhost:8888/upload', data);
+
+                    console.log('res =', res);
 
                     chunks = [];
 
