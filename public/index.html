@@ -7,8 +7,91 @@
 </head>
 <body>
     <h1>Audio To Text Converter</h1>
+    <p id="recording-status">Ready...</p>
+    <div class="container">
+        <button id="start-record">Start</button>
+        <button id="stop-record">Stop</button>
+    </div>
+    <div id="audio-clips-container">
+
+    </div>
     <script>
-        console.log('hi world');
+        const startRecordButton = document.getElementById("start-record"), stopRecordButton = document.getElementById("stop-record"),
+        recordingStatusText = document.getElementById("recording-status"),
+        audioClipsContainer = document.getElementById("audio-clips-container");
+
+        let mediaRecorder;
+        let chunks =[];
+
+        startRecordButton.addEventListener('click', async function () {
+            try {
+                recordingStatusText.innerText = 'Recording...';
+
+                if(navigator.mediaDevices.getUserMedia) {
+                    const constraints = {audio: true}
+                    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.start();
+
+                    mediaRecorder.ondataavailable = (e) => {
+                        chunks.push(e.data)
+                    };
+
+
+
+                } else {
+                    alert(`not available on device`)
+                }
+
+
+
+
+            } catch (error) {
+                console.log('error =', error);
+            }
+        });
+
+        stopRecordButton.addEventListener('click', async function () {
+            try {
+                recordingStatusText.innerText = 'Stopped Recording...';
+
+                mediaRecorder.stop();
+
+                mediaRecorder.onstop = (e) => {
+                    const audioClip = document.createElement("audio");
+
+                    audioClip.setAttribute("controls", "")
+                    
+                    audioClipsContainer.appendChild(audioClip);
+
+                    const blob = new Blob(chunks, {type: "audio/mp3; codecs=opus"});
+
+                    chunks = [];
+
+                    const audioURL = window.URL.createObjectURL(blob);
+                    
+                    audioClip.src = audioURL;
+
+
+                };
+
+                
+
+
+
+
+
+
+                setTimeout(function(){
+                    recordingStatusText.innerText = 'Ready...';
+                }, 1000)
+            } catch (error) {
+                console.log('error =', error);
+            }
+        });
+
     </script>
 </body>
 </html>
