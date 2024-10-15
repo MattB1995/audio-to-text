@@ -77,10 +77,20 @@
 
                     console.log('res =', res);
 
+                    const audioText = res.data.result;
+
+                    const resultText = document.createElement('p');
+
+                    resultText.innerText = audioText;
+
+                    audioClipsContainer.appendChild(resultText);
+
                     chunks = [];
 
-                    const audioURL = window.URL.createObjectURL(blob);
+                    //const audioURL = window.URL.createObjectURL(blob);
                     
+                    const audioURL = res.data.link;
+
                     audioClip.src = audioURL;
 
 
